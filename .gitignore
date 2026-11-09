@@ -1,0 +1,16 @@
+venv/
+env/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.apk
+*.aab
+*.pyc
+.buildozer/
+bin/
+.vscode/
+.idea/
+*.swp
+*.db
+*.sqlite
