@@ -3,6 +3,8 @@ import json
 import os
 import re
 from kivy.app import App
+import shutil
+import datetime
 
 TYPE_MAP = {
     "Текст": "TEXT",
@@ -169,3 +171,21 @@ def delete_table(name):
     conn.execute("DELETE FROM tables_registry WHERE name = ?", (name,))
     conn.commit()
     conn.close()
+
+def backup_db():
+    src = get_db_path()
+    
+    try:
+        from android.storage import primary_external_storage_path
+        dest_dir = os.path.join(primary_external_storage_path(), "Download")
+    except ImportError:
+        dest_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+        
+    date_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+    dest = os.path.join(dest_dir, f"pocketdb_backup_{date_str}.db")
+    
+    shutil.copy2(src, dest)
+    return dest

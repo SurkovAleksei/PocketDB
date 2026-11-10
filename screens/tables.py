@@ -42,11 +42,9 @@ class TablesScreen(MDScreen):
                 item.display_name = t["display_name"]
                 item._long_fired = False
                 
-                # Привязываем долгий тап
                 item.bind(on_touch_down=self._on_touch_down)
                 item.bind(on_touch_up=self._on_touch_up)
                 
-                # ДОБАВЛЯЕМ ОБЫЧНЫЙ КЛИК (открытие таблицы)
                 item.bind(on_release=lambda x, name=t["name"]: self.open_table(name))
                 
                 top_zone.add_widget(item)
@@ -57,8 +55,17 @@ class TablesScreen(MDScreen):
 
         bottom_zone = MDBoxLayout(orientation="horizontal", size_hint_y=None, height=dp(72), spacing=dp(8), padding=[dp(12), dp(8), dp(12), dp(12)])
         bottom_zone.md_bg_color = BG
-        bottom_zone.add_widget(MDButton(MDButtonText(text="Добавить таблицу"), style="filled", on_release=lambda x: self.show_create()))
-        bottom_zone.add_widget(MDButton(MDButtonText(text="Заглушка"), style="outlined", on_release=lambda x: notify("В разработке")))
+        
+        btn_add = MDButton(MDButtonText(text="Добавить"), style="filled", size_hint_x=0.4, on_release=lambda x: self.show_create())
+        
+        btn_stub = MDButton(MDButtonText(text="Заглушка"), style="outlined", size_hint_x=0.4, on_release=lambda x: notify("В разработке"))
+        
+        btn_backup = MDButton(MDButtonText(text="Бэкап"), style="outlined", size_hint=(None, None), size=(dp(80), dp(48)), on_release=self.do_backup)
+        
+        bottom_zone.add_widget(btn_add)
+        bottom_zone.add_widget(btn_stub)
+        bottom_zone.add_widget(btn_backup)
+        
         container.add_widget(bottom_zone)
 
     def _on_touch_down(self, item, touch):
@@ -86,6 +93,13 @@ class TablesScreen(MDScreen):
 
     def show_create(self):
         CreateTableModal(on_created=self.refresh).open()
+
+    def do_backup(self, *args):
+        try:
+            path = db.backup_db()
+            notify(f"Копия сохранена:\n{path}", is_error=False)
+        except Exception as e:
+            notify(f"Ошибка: {e}", is_error=True)
 
 class ConfirmDeleteTableModal(BaseModal):
     def __init__(self, table_name, display_name, on_confirm=None, **kwargs):

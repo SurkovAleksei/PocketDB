@@ -91,5 +91,31 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(db.format_value("Текст"), "Текст")
         self.assertEqual(db.format_value(None), "")
 
+    # Тест 7: Резервное копирование базы данных
+    def test_backup_db(self):
+        import tempfile
+        import os
+        import shutil
+        
+        test_dir = tempfile.mkdtemp()
+        
+        original_expanduser = os.path.expanduser
+        os.path.expanduser = lambda x: test_dir
+        
+        try:
+            columns = [{"name": "Игрок", "type": "Текст"}]
+            db.create_table("Тест бэкапа", columns)
+            
+            backup_path = db.backup_db()
+            
+            self.assertTrue(os.path.exists(backup_path))
+            self.assertTrue(backup_path.endswith(".db"))
+            self.assertGreater(os.path.getsize(backup_path), 0)
+            
+        finally:
+            os.path.expanduser = original_expanduser
+            if os.path.exists(test_dir):
+                shutil.rmtree(test_dir, ignore_errors=True)
+
 if __name__ == '__main__':
     unittest.main()
