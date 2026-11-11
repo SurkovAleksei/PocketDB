@@ -7,6 +7,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.utils import get_color_from_hex
+from widgets.responsive_buttons import ResponsiveButtons
 
 import db
 from modals.create_table import CreateTableModal
@@ -53,15 +54,27 @@ class TablesScreen(MDScreen):
         scroll.add_widget(top_zone)
         container.add_widget(scroll)
 
-        bottom_zone = MDBoxLayout(orientation="horizontal", size_hint_y=None, height=dp(72), spacing=dp(8), padding=[dp(12), dp(8), dp(12), dp(12)])
+        bottom_zone = ResponsiveButtons()
         bottom_zone.md_bg_color = BG
+
+        btn_add = MDButton(
+            MDButtonText(text="Добавить"), 
+            style="filled", 
+            on_release=lambda x: self.show_create()
+        )
         
-        btn_add = MDButton(MDButtonText(text="Добавить"), style="filled", size_hint_x=0.4, on_release=lambda x: self.show_create())
+        btn_stub = MDButton(
+            MDButtonText(text="Заглушка"), 
+            style="outlined", 
+            on_release=lambda x: notify("В разработке")
+        )
         
-        btn_stub = MDButton(MDButtonText(text="Заглушка"), style="outlined", size_hint_x=0.4, on_release=lambda x: notify("В разработке"))
-        
-        btn_backup = MDButton(MDButtonText(text="Бэкап"), style="outlined", size_hint=(None, None), size=(dp(80), dp(48)), on_release=self.do_backup)
-        
+        btn_backup = MDButton(
+            MDButtonText(text="Бэкап"), 
+            style="outlined", 
+            on_release=self.do_backup
+        )
+
         bottom_zone.add_widget(btn_add)
         bottom_zone.add_widget(btn_stub)
         bottom_zone.add_widget(btn_backup)
